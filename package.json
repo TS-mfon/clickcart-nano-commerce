@@ -1,0 +1,11 @@
+{
+  "name": "clickcart-nano-commerce",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "api:test": "npm --prefix api test",
+    "web:build": "npm --prefix web run build",
+    "demo:run": "npm --prefix api run demo:run"
+  }
+}

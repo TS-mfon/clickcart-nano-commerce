@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: clickcart-nano-commerce-api
+    env: node
+    rootDir: api
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: ARC_RPC_URL
+        value: https://rpc.testnet.arc.network
+      - key: ARC_NETWORK
+        value: eip155:5042002
+      - key: ARC_USDC_ADDRESS
+        value: 0x3600000000000000000000000000000000000000
+      - key: ENABLE_REAL_X402
+        value: true
+      - key: SELLER_ADDRESS
+        sync: false

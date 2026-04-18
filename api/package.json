@@ -1,0 +1,28 @@
+{
+  "name": "clickcart-nano-commerce-api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch src/server.js",
+    "start": "node src/server.js",
+    "test": "node --test src/*.test.js",
+    "demo:deposit": "node ../scripts/deposit.js",
+    "demo:run": "node ../scripts/run-demo.js",
+    "demo:export": "node ../scripts/export-metrics.js"
+  },
+  "dependencies": {
+    "@circle-fin/x402-batching": "^2.1.0",
+    "@x402/core": "^2.10.0",
+    "@x402/evm": "^2.10.0",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "nanoid": "^5.1.6",
+    "viem": "^2.47.12",
+    "zod": "^4.1.13"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6"
+  }
+}
