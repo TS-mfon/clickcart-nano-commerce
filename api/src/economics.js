@@ -24,6 +24,6 @@ export function economics() {
     estimatedGasIfOneTxPerActionUsd: gasBaseline.toFixed(6),
     nanopaymentCostAdvantageUsd: Math.max(cardFees, gasBaseline).toFixed(6),
     explanation:
-      "The demo prices each action at sub-cent levels. A $0.30 + 2.9% card fee or even $0.005 gas per action exceeds or destroys revenue, while Circle Nanopayments use gas-free authorizations and batched settlement.",
+      "This product prices each real x402 action at sub-cent levels. A $0.30 + 2.9% card fee or even $0.005 gas per action exceeds or destroys revenue, while Circle Nanopayments use gas-free authorizations and batched settlement.",
   };
 }

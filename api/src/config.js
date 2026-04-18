@@ -4,12 +4,11 @@ export const project = {
   "track": "Real-Time Micro-Commerce Flow",
   "tagline": "Digital commerce priced per preview, tip, insight, and stream tick.",
   "problem": "Consumer digital goods are forced into ads, subscriptions, bundles, and minimum checkouts because tiny interactions cannot be charged directly.",
-  "demoLabel": "Run 120 paid commerce interactions",
-  "actions": [
+    "actions": [
     {
       "id": "sample",
       "method": "GET",
-      "path": "/paid/sample/demo",
+      "path": "/paid/sample/featured",
       "label": "Preview Sample",
       "price": "0.0005",
       "units": 30
@@ -44,11 +43,11 @@ export const project = {
 
 export const env = {
   port: Number(process.env.PORT || 8787),
-  sellerAddress: process.env.SELLER_ADDRESS || "0x0000000000000000000000000000000000000000",
+  sellerAddress: process.env.SELLER_ADDRESS || "0x5905c9Dea6Ae52AA0947D8F7F218263889eDfC4E",
   arcNetwork: process.env.ARC_NETWORK || "eip155:5042002",
   arcRpcUrl: process.env.ARC_RPC_URL || "https://rpc.testnet.arc.network",
   arcUsdcAddress: process.env.ARC_USDC_ADDRESS || "0x3600000000000000000000000000000000000000",
-  enableRealX402: process.env.ENABLE_REAL_X402 !== "false",
+  enableRealX402: true,
   dataFile: process.env.DATA_FILE || "./data/events.json",
   receiptContract: process.env.RECEIPT_CONTRACT_ADDRESS || "",
 };

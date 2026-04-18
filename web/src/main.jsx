@@ -8,12 +8,11 @@ const project = {
   "track": "Real-Time Micro-Commerce Flow",
   "tagline": "Digital commerce priced per preview, tip, insight, and stream tick.",
   "problem": "Consumer digital goods are forced into ads, subscriptions, bundles, and minimum checkouts because tiny interactions cannot be charged directly.",
-  "demoLabel": "Run 120 paid commerce interactions",
   "actions": [
     {
       "id": "sample",
       "method": "GET",
-      "path": "/paid/sample/demo",
+      "path": "/paid/sample/featured",
       "label": "Preview Sample",
       "price": "0.0005",
       "units": 30
@@ -47,14 +46,13 @@ const project = {
 };
 const brand = {
   "slug": "clickcart-nano-commerce",
-  "title": "ClickCart Nano Commerce",
   "short": "ClickCart",
   "accent": "#f97316",
   "accent2": "#0d9488",
-  "track": "Real-Time Micro-Commerce",
-  "pitch": "Charge directly for previews, stream ticks, tips, and unlocks."
+  "api": "https://clickcart-nano-commerce-api.onrender.com"
 };
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8787";
+const API_URL = import.meta.env.VITE_API_URL || "https://clickcart-nano-commerce-api.onrender.com";
+const SELLER_ADDRESS = "0x5905c9Dea6Ae52AA0947D8F7F218263889eDfC4E";
 
 function dollars(value) {
   return "$" + Number(value || 0).toFixed(6);
@@ -67,7 +65,7 @@ function compactAddress(value) {
 
 function App() {
   const [metrics, setMetrics] = useState({ events: [], economics: {} });
-  const [running, setRunning] = useState(false);
+  const [requirement, setRequirement] = useState(null);
   const [error, setError] = useState("");
 
   async function refresh() {
@@ -75,45 +73,35 @@ function App() {
     setMetrics(await response.json());
   }
 
-  async function runDemo() {
-    setRunning(true);
+  async function inspectPayment() {
     setError("");
+    setRequirement(null);
     try {
-      await fetch(API_URL + "/demo/reset", { method: "POST" });
-      for (const action of project.actions) {
-        for (let i = 0; i < action.units; i++) {
-          const response = await fetch(API_URL + action.path, {
-            method: action.method,
-            headers: {
-              "content-type": "application/json",
-              "X-DEMO-PAYMENT": "browser-demo-payment",
-              "X-DEMO-PAYER": "0x000000000000000000000000000000000000bEEF",
-              "X-REQUEST-START": String(Date.now()),
-            },
-            body: action.method === "GET" ? undefined : JSON.stringify({ sequence: i + 1, goal: project.story }),
-          });
-          if (!response.ok) throw new Error(await response.text());
-          if ((i + 1) % 4 === 0) await refresh();
-        }
+      const action = project.actions[0];
+      const response = await fetch(API_URL + action.path, {
+        method: action.method,
+        headers: { "content-type": "application/json" },
+        body: action.method === "GET" ? undefined : JSON.stringify({ probe: true }),
+      });
+      const header = response.headers.get("PAYMENT-REQUIRED");
+      if (!header) {
+        throw new Error("No x402 PAYMENT-REQUIRED header returned.");
       }
-      await refresh();
+      setRequirement(JSON.parse(atob(header)));
     } catch (err) {
       setError(err.message);
-    } finally {
-      setRunning(false);
     }
   }
 
   useEffect(() => {
-    refresh().catch(() => setError("API is not reachable. Start the API or set VITE_API_URL."));
-    const id = setInterval(() => refresh().catch(() => {}), 2500);
+    refresh().catch(() => setError("API is not reachable. Check the Render service URL."));
+    const id = setInterval(() => refresh().catch(() => {}), 4000);
     return () => clearInterval(id);
   }, []);
 
   const economics = metrics.economics || {};
   const recent = metrics.events || [];
-  const totalPlanned = useMemo(() => project.actions.reduce((sum, action) => sum + action.units, 0), []);
-  const progress = Math.min(100, ((economics.successfulPaidActions || 0) / totalPlanned) * 100);
+  const totalConfigured = useMemo(() => project.actions.reduce((sum, action) => sum + action.units, 0), []);
 
   return (
     <main style={{ "--accent": brand.accent, "--accent-2": brand.accent2 }}>
@@ -125,23 +113,22 @@ function App() {
         </nav>
         <div className="hero-grid">
           <div className="hero-copy">
-            <p className="eyebrow">{brand.track}</p>
+            <p className="eyebrow">Real Arc x402 product</p>
             <h1>{project.title}</h1>
             <p className="tagline">{brand.pitch}</p>
             <p className="problem">{project.problem}</p>
             <div className="hero-actions">
-              <button onClick={runDemo} disabled={running}>{running ? "Running demo..." : project.demoLabel}</button>
-              <span>{totalPlanned}+ priced actions, all at or below $0.01.</span>
+              <button onClick={inspectPayment}>Inspect x402 payment terms</button>
+              <span>Payments require Circle Gateway x402 on Arc Testnet.</span>
             </div>
           </div>
           <div className="terminal">
             <div className="terminal-top"><span></span><span></span><span></span></div>
-            <p>$ curl paid-resource</p>
-            <p className="dim">402 Payment Required</p>
-            <p>$ gateway.pay()</p>
-            <p className="success">200 OK · USDC nanopayment settled</p>
-            <div className="progress"><i style={{ width: progress + "%" }} /></div>
-            <small>{Math.round(progress)}% of demo target complete</small>
+            <p>$ npm run gateway:deposit</p>
+            <p className="dim">fund Gateway balance on Arc Testnet</p>
+            <p>$ npm run gateway:pay</p>
+            <p className="success">GatewayClient signs, settles, and returns paid resource data</p>
+            <small>Seller: {compactAddress(SELLER_ADDRESS)}</small>
           </div>
         </div>
       </section>
@@ -149,7 +136,7 @@ function App() {
       {error && <p className="error">{error}</p>}
 
       <section className="metrics">
-        <article><span>Paid actions</span><strong>{economics.successfulPaidActions || 0}</strong><small>Target {totalPlanned}</small></article>
+        <article><span>Settled paid actions</span><strong>{economics.successfulPaidActions || 0}</strong><small>Real x402 calls recorded</small></article>
         <article><span>Total revenue</span><strong>{dollars(economics.totalRevenueUsd)}</strong><small>USDC revenue</small></article>
         <article><span>Average price</span><strong>{dollars(economics.averagePriceUsd)}</strong><small>Sub-cent unit price</small></article>
         <article><span>Card fee loss</span><strong>{dollars(economics.estimatedCardFeesUsd)}</strong><small>$0.30 + 2.9%</small></article>
@@ -159,8 +146,8 @@ function App() {
       <section className="workspace">
         <div className="panel actions-panel">
           <div className="panel-title">
-            <h2>Priced Actions</h2>
-            <span>Production x402 path, local fallback for demos</span>
+            <h2>Real Paid Endpoints</h2>
+            <span>{totalConfigured} configured product actions</span>
           </div>
           <div className="actions">
             {project.actions.map((action, index) => (
@@ -171,37 +158,45 @@ function App() {
                   <span>{action.method} {action.path}</span>
                 </div>
                 <em>${action.price}</em>
-                <small>{action.units} calls</small>
+                <small>Gateway x402</small>
               </div>
             ))}
           </div>
         </div>
         <div className="panel proof-panel">
           <div className="panel-title">
-            <h2>Economic Proof</h2>
-            <span>Why this needs nanopayments</span>
+            <h2>How To Pay</h2>
+            <span>For people and agents</span>
           </div>
-          <p>{economics.explanation || "Run the demo to generate the margin proof."}</p>
-          <div className="proof-card">
-            <strong>{dollars(economics.totalRevenueUsd)}</strong>
-            <span>revenue would face {dollars(economics.estimatedCardFeesUsd)} in card fees.</span>
-          </div>
+          <p>Use a rotated Arc Testnet wallet with USDC from the Circle faucet. Deposit once to Circle Gateway, then call paid endpoints with <code>GatewayClient.pay()</code>.</p>
+          <pre>{`cd clickcart-nano-commerce/api\nBUYER_PRIVATE_KEY=0x... npm run gateway:deposit`}</pre>
+          <pre>{`cd clickcart-nano-commerce/api\nBUYER_PRIVATE_KEY=0x... API_URL=https://clickcart-nano-commerce-api.onrender.com npm run gateway:pay`}</pre>
         </div>
       </section>
 
+      {requirement && (
+        <section className="panel">
+          <div className="panel-title">
+            <h2>x402 Payment Requirement</h2>
+            <span>{project.actions[0].label}</span>
+          </div>
+          <pre>{JSON.stringify(requirement, null, 2)}</pre>
+        </section>
+      )}
+
       <section className="panel feed-panel">
         <div className="panel-title">
-          <h2>Live Payment Feed</h2>
-          <span>{recent.length} recorded actions</span>
+          <h2>Real Payment Feed</h2>
+          <span>{recent.length} recorded settlements</span>
         </div>
         <div className="table">
-          <div className="row head"><span>Action</span><span>Amount</span><span>Buyer</span><span>Latency</span></div>
+          <div className="row head"><span>Action</span><span>Amount</span><span>Buyer</span><span>Gateway Tx</span></div>
           {recent.slice(0, 20).map((event) => (
             <div className="row" key={event.id}>
               <span>{event.actionType}</span>
               <span>{dollars(event.amountUsd)}</span>
               <span>{compactAddress(event.buyer)}</span>
-              <span>{event.latencyMs}ms</span>
+              <span>{event.gatewayTransferId ? compactAddress(event.gatewayTransferId) : "settled"}</span>
             </div>
           ))}
         </div>

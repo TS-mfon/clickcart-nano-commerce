@@ -7,9 +7,10 @@
     "dev": "node --watch src/server.js",
     "start": "node src/server.js",
     "test": "node --test src/*.test.js",
-    "demo:deposit": "node ../scripts/deposit.js",
-    "demo:run": "node ../scripts/run-demo.js",
-    "demo:export": "node ../scripts/export-metrics.js"
+    "gateway:deposit": "node ../scripts/deposit.js",
+    "gateway:pay": "node ../scripts/run-payment.js",
+    "gateway:supports": "node ../scripts/supports.js",
+    "metrics:export": "node ../scripts/export-metrics.js"
   },
   "dependencies": {
     "@circle-fin/x402-batching": "^2.1.0",

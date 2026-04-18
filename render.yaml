@@ -16,3 +16,5 @@ services:
         value: true
       - key: SELLER_ADDRESS
         sync: false
+      - key: NODE_OPTIONS
+        value: --dns-result-order=ipv4first

@@ -6,6 +6,6 @@
   "scripts": {
     "api:test": "npm --prefix api test",
     "web:build": "npm --prefix web run build",
-    "demo:run": "npm --prefix api run demo:run"
+    "gateway:pay": "npm --prefix api run gateway:pay"
   }
 }
